@@ -1,2 +1,2 @@
-# pygame-animations
+# anime
 Animation framework for pygame

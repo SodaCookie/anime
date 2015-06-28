@@ -1,32 +1,50 @@
+from functools import reduce
+
 class _RubberBand(object):
+
+    @staticmethod
+    def addition_reducer(owner, child):
+        return owner + child
+
+    @staticmethod
+    def top_level_reducer(owner, child):
+        return owner
 
     def __init__(self):
         super().__init__()
 
-        self._owner = None
-        self._children = []
-        self._dirty = False
-        self._dirtied = set()
-        self._filters = {}
-        self._reducers = {}
-        self._dest = {}
+        object.__setattr__(self, "_reducers", {})
+        object.__setattr__(self, "_owner", None)
+        object.__setattr__(self, "_children", [])
+        object.__setattr__(self, "_dirty", False)
+        object.__setattr__(self, "_dirtied", set())
+        object.__setattr__(self, "_filters", {})
+        object.__setattr__(self, "_dest", {})
 
     def __setattr__(self, name, value):
         """If attribute already exists and contains a filter funtion
         than the object will be marked as dirty and the name of the attribute
         will be passed onto the _dirtied to be passed as string and the
         destination set in a dictionary"""
-        if hasattr(self, name) and self._filters.get(name):
-            self._set_dirty(name)
-            self._dest[name] = value
+        if hasattr(self, name):
+            if self._filters.get(name):
+                self._set_dirty(name)
+                self._dest[name] = value
+            else:
+                # Will be clean if not filter is specified
+                object.__setattr__(self, name, value)
         else:
             object.__setattr__(self, name, value)
+            if isinstance(value, (int, float, complex)):
+                self._reducers[name] = _RubberBand.addition_reducer
+            else:
+                self._reducers[name] = _RubberBand.top_level_reducer
 
     def set_owner(self, owner):
         """Used to set ownership of an object, the ownership of an object
         applies all effects down the tree additively for numeric values,
         highest level owner as boolean."""
-        object.__setattr__('owner', owner)
+        object.__setattr__(self, '_owner', owner)
         owner._children.append(self)
 
     def get_owner(self):
@@ -42,6 +60,7 @@ class _RubberBand(object):
         return self._filters.get(name)
 
     def set_reducer(self, name, reducer):
+        """Reducers are on the lowest level"""
         self._reducers[name] = reducer
 
     def get_reducer(self, name):
@@ -50,8 +69,14 @@ class _RubberBand(object):
     def is_dirty(self):
         return self._dirty
 
+    def get_dirtied(self):
+        return self._dirtied
+
     def get_absolute_value(self, name):
-        if self.get_owner():
+        attr = [getattr(owner, name) for owner in self._get_owner_list()]
+        if len(attr) == 1:
+            return attr[0]
+        return reduce(self.get_reducer(name), attr)
 
     def _update(self):
         for name in self._dirtied:
@@ -63,10 +88,13 @@ class _RubberBand(object):
             if self._filters.done(getattr(self, name), self._dest[name]):
                 self._set_clean(name)
 
-    def _get_top_reducer(self, name):
-        if self.get_owner():
-            return self.get_owner().get_reducer()
-        return self._reducers
+    def _get_owner_list(self):  #FIX Should rename...
+        cur = self
+        owner_list = [cur]
+        while cur.get_owner():
+            cur = cur.get_owner()
+            owner_list.append(cur)
+        return owner_list[::-1]
 
     def _set_clean(self, name):
         self._dirtied.remove(name)

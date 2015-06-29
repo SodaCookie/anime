@@ -78,15 +78,16 @@ class _RubberBand(object):
             return attr[0]
         return reduce(self.get_reducer(name), attr)
 
-    def _update(self):
+    def update(self):
         for name in self._dirtied:
-            if not self._filters.get(name):
-                object.__setattr__(self, name, self._dest[name])
-            else:
-                object.__setattr__(self, name,
-                    self._filters[name](getattr(self, name), self._dest[name]))
-            if self._filters.done(getattr(self, name), self._dest[name]):
-                self._set_clean(name)
+            object.__setattr__(self, name,
+                self._filters[name](getattr(self, name), self._dest[name]))
+            if hasattr(self._filters[name], 'done'):
+                if self._filters.done(getattr(self, name), self._dest[name]):
+                    self._set_clean(name)
+            else: # Defaults to is equal
+                if getattr(self, name) == self._dest[name]:
+                    self._set_clean(name)
 
     def _get_owner_list(self):  #FIX Should rename...
         cur = self

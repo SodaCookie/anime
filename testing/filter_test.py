@@ -15,8 +15,8 @@ class FilterTester(unittest.TestCase):
 
     def setUp(self):
         self.a = RubberTestClass()
-        self.a.set_filter('linear', LINEAR, 3)
-        self.a.set_filter('spring', SPRING)
+        self.a.set_filter('linear', Linear(3))
+        self.a.set_filter('spring', Spring(1, 0))
 
     def tearDown(self):
         del self.a

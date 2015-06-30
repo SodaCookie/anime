@@ -2,7 +2,7 @@ import math
 from types import MethodType
 
 
-def linear(cur, dest, speed=1):
+def linear(cur, dest, speed):
     if cur < dest:
         if cur + speed > dest:
             return dest, speed
@@ -13,7 +13,7 @@ def linear(cur, dest, speed=1):
         return cur - speed, speed
 
 
-def spring(cur, dest, speed=0, k=1, b=1):
+def spring(cur, dest, speed):
     # for animations, destX is really spring length (spring at rest). initial
     # position is considered as the stretched/compressed posiiton of a spring
     force = -k * (cur - dest)
@@ -30,26 +30,28 @@ def spring(cur, dest, speed=0, k=1, b=1):
     new_speed = speed + a
 
     return new_cur, new_speed
-}
+
+def done_speed_dest(cur, dest, speed):
+    return speed == 0 and cur == dest
+
 
 class Filter(object):
+    """Takes current, destination, speed"""
 
-    def __init__(self, call, done):
-        self.call = MethodType(call, self, type(self))
-        self.done = MethodType(done, self, type(self))
+    def __init__(self, call=None, done=None):
+        if call: self.call = call
+        if done: self.done = done
 
-        for key, value in kwarg.items():
-            setattr(self, key, value)
-
-    def __call__(self, cur, dest):
+    def __call__(self, cur, dest, speed):
         """Functions return the new value"""
-        return self.call(cur, dest)
+        return self.call(cur, dest, speed)
 
-    def done(self, cur, dest):
+    def call(self, cur, dest, speed):
+        return dest, speed
+
+    def done(self, cur, dest, speed):
         return cur == dest
 
 
-class Linear(Filter):
-
-    def __init__(self, speed):
-        self.speed = speed
+LINEAR = Filter(linear)
+SPRING = Filter(spring, done_speed_dest)

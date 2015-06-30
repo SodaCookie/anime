@@ -1,10 +1,8 @@
 import unittest
 
-import pygame
+from anime.core.rubberband import RubberBand
 
-from anime.core._rubberband import _RubberBand
-
-class RubberTestClass(_RubberBand):
+class RubberTestClass(RubberBand):
 
     def __init__(self):
         super().__init__()

@@ -1,6 +1,6 @@
 from functools import reduce
 
-class _RubberBand(object):
+class RubberBand(object):
 
     @staticmethod
     def addition_reducer(owner, child):
@@ -36,9 +36,9 @@ class _RubberBand(object):
         else:
             object.__setattr__(self, name, value)
             if isinstance(value, (int, float, complex)):
-                self._reducers[name] = _RubberBand.addition_reducer
+                self._reducers[name] = RubberBand.addition_reducer
             else:
-                self._reducers[name] = _RubberBand.top_level_reducer
+                self._reducers[name] = RubberBand.top_level_reducer
 
     def set_owner(self, owner):
         """Used to set ownership of an object, the ownership of an object
@@ -53,8 +53,11 @@ class _RubberBand(object):
     def get_dest(self, name):
         return self._dest.get(name)
 
-    def set_filter(self, name, filter):
+    def set_filter(self, name, filter, speed=0):
+        if not hasattr(self, name):
+            raise ValueError("Does not contain the attribute %s" % name)
         self._filters[name] = filter
+        object.__setattr__(self, "_%s_speed" % name, speed)
 
     def get_filter(self, name):
         return self._filters.get(name)
@@ -62,6 +65,9 @@ class _RubberBand(object):
     def set_reducer(self, name, reducer):
         """Reducers are on the lowest level"""
         self._reducers[name] = reducer
+
+    def get_speed(self, name):
+        return getattr(self, "_%s_speed" % name)
 
     def get_reducer(self, name):
         return self._reducers.get(name)
@@ -79,15 +85,20 @@ class _RubberBand(object):
         return reduce(self.get_reducer(name), attr)
 
     def update(self):
-        for name in self._dirtied:
-            object.__setattr__(self, name,
-                self._filters[name](getattr(self, name), self._dest[name]))
+        dirty = self._dirtied.copy()
+        for name in dirty:
+            value, speed = self._filters[name](getattr(self, name),
+                self._dest[name], getattr(self, "_%s_speed" % name))
+            object.__setattr__(self, name, value)
+            object.__setattr__(self, "_%s_speed" % name, speed)
             if hasattr(self._filters[name], 'done'):
-                if self._filters.done(getattr(self, name), self._dest[name]):
+                if self._filters[name].done(getattr(self, name),
+                        self._dest[name], getattr(self, "_%s_speed" % name)):
                     self._set_clean(name)
-            else: # Defaults to is equal
+            else: # Defaults to is equality
                 if getattr(self, name) == self._dest[name]:
                     self._set_clean(name)
+        self._dirtied
 
     def _get_owner_list(self):  #FIX Should rename...
         cur = self

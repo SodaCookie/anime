@@ -12,8 +12,8 @@ test_surface2.fill((255, 255, 255, 255))
 
 a = anime.Anime(test_surface, 400, 300)
 b = anime.Anime(test_surface2, 150, 150)
-a.set_filter('angle', anime.filter.linear, 4)
-a.set_filter('x', anime.filter.Spring(0.1, 0.5))
+a.set_filter('w_ratio', anime.filter.spring)
+a.set_filter('h_ratio', anime.filter.spring)
 b.set_owner(a)
 counter = 2
 playing = True
@@ -24,12 +24,13 @@ while playing:
         if e.type == pygame.QUIT:
             playing = False
         if e.type == pygame.MOUSEBUTTONDOWN:
-            counter = 4 if counter%4 else 2
-            if counter == 2:
-                a.x = 100
-            else:
-                a.x = 700
-
+            a.width = 500
+            a.height = 500
+            # counter = 4 if counter%4 else 2
+            # if counter == 2:
+            #     a.x = 100
+            # else:
+            #     a.x = 700
     screen.fill((255,255,255))
     a.update()
     b.update()

@@ -1,13 +1,25 @@
 import unittest
 
 from anime.core.rubberband import RubberBand
+from anime.core.filter import linear
 
 class RubberTestClass(RubberBand):
 
     def __init__(self):
         super().__init__()
         self.addition = 1
+        self.x = 0
+        self.y = 0
         self.top_level = "test"
+
+    def set_pos(self, pos):
+        self.x = pos[0]
+        self.y = pos[1]
+
+    def get_pos(self):
+        return self.x, self.y
+
+    pos = property(get_pos, set_pos)
 
 
 class RubberBandTester(unittest.TestCase):
@@ -42,6 +54,14 @@ class RubberBandTester(unittest.TestCase):
     def test_no_filter(self):
         self.a.top_level = "test2"
         self.assertFalse(self.a.is_dirty()) # does not contain a filter
+
+    def test_property(self):
+        self.a.set_filter('x', linear)
+        self.a.set_filter('y', linear)
+        self.a.pos = (1, 2)
+        self.assertEqual(self.a.get_dest('x'), 1)
+        self.assertEqual(self.a.get_dest('y'), 2)
+
 
 
 if __name__ == '__main__':

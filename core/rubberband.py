@@ -30,6 +30,13 @@ class RubberBand(object):
         than the object will be marked as dirty and the name of the attribute
         will be passed onto the _dirtied to be passed as string and the
         destination set in a dictionary"""
+        if hasattr(type(self), name) and \
+                isinstance(getattr(type(self), name), property):
+            # Here we ignore an properties that the object may have in
+            # case the user wishes to define properties
+            object.__setattr__(self, name, value)
+            return
+
         if hasattr(self, name):
             if self._filters.get(name):
                 self._set_dirty(name)
@@ -110,6 +117,7 @@ class RubberBand(object):
             self._filters[name].speed = speed
             if self._filters[name].done(getattr(self, name),
                     self._dest[name], self._filters[name].speed):
+                object.__setattr__(self, name, self._dest[name])
                 self._set_clean(name)
         self._dirtied
 
@@ -123,6 +131,7 @@ class RubberBand(object):
 
     def _set_clean(self, name):
         self._dirtied.remove(name)
+        del self._dest[name]
         if not self._dirtied:
             object.__setattr__(self, "_dirty", False)
 

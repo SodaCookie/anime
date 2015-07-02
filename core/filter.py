@@ -13,7 +13,7 @@ def linear(cur, dest, speed):
         return cur - speed, speed
 
 
-def spring(cur, dest, speed, k=1, b=0):
+def spring(cur, dest, speed, k=0.2, b=0.5):
     # for animations, destX is really spring length (spring at rest). initial
     # position is considered as the stretched/compressed posiiton of a spring
     force = -k * (cur - dest)
@@ -39,7 +39,7 @@ def time(cur, dest, speed, index=0, frames=10):
 
 
 def done_speed_dest(cur, dest, speed):
-    return speed == 0 and cur == dest
+    return abs(speed) < 3 and abs(cur-dest) < 3
 
 
 class Filter(object):
@@ -74,7 +74,7 @@ class Spring(Filter):
         self.k = k
         self.b = b
 
-    def call(cur, dest, speed):
+    def call(self, cur, dest, speed):
         # for animations, destX is really spring length (spring at rest). initial
         # position is considered as the stretched/compressed posiiton of a spring
         force = -self.k * (cur - dest)

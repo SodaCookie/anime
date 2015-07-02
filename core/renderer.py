@@ -11,6 +11,14 @@ def hratio_renderer(surface, hratio):
     w, h = surface.get_size()
     return pygame.transform.scale(surface, (w, round(h*hratio)))
 
+def wratio_smooth_renderer(surface, wratio):
+    w, h = surface.get_size()
+    return pygame.transform.smoothscale(surface, (round(w*wratio), h))
+
+def hratio_smooth_renderer(surface, hratio):
+    w, h = surface.get_size()
+    return pygame.transform.smoothscale(surface, (w, round(h*hratio)))
+
 def opacity_renderer(surface, opacity):
     if opacity == 255:
         return surface

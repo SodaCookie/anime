@@ -38,6 +38,10 @@ def time(cur, dest, speed, index=0, frames=10):
     return cur+diff*index/frames, diff/frames
 
 
+def done_almost_equal(cur, dest, speed, ndigits=3):
+    return round(cur, ndigits) == round(dest, ndigits)
+
+
 def done_speed_dest(cur, dest, speed):
     return abs(speed) < 3 and abs(cur-dest) < 3
 

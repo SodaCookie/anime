@@ -67,13 +67,13 @@ class RubberBand(object):
     def get_dest(self, name):
         return self._dest.get(name)
 
-    def set_filter(self, name, filter, speed=None):
+    def set_filter(self, name, filter, speed=None, done=None):
         if not hasattr(self, name):
             raise ValueError("Does not contain the attribute %s" % name)
         if isinstance(filter, FunctionType):
             if speed is None:
                 speed = 0
-            self._filters[name] = Filter(filter, None, speed)
+            self._filters[name] = Filter(filter, done, speed)
         else:
             cpy_filter = deepcopy(filter)
             if speed is not None:
@@ -82,6 +82,12 @@ class RubberBand(object):
 
     def get_filter(self, name):
         return self._filters.get(name)
+
+    def remove_filter(self, name):
+        if self._dest.get(name):
+            object.__setattr__(self, name, self._dest[name])
+            self._set_clean(name)
+        del self._filters[name]
 
     def set_reducer(self, name, reducer):
         """Reducers are on the lowest level"""

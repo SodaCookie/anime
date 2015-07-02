@@ -28,6 +28,8 @@ while playing:
             for a in animes:
                 if a.collide_point(mx, my):
                     animes.remove(a)
+                    a.remove_filter('x')
+                    a.remove_filter('y')
                     on_hand = a
                     rect = a.get_bounding_rect()
                     offsetx = mx - rect.center[0]
@@ -36,6 +38,8 @@ while playing:
         elif e.type == pygame.MOUSEBUTTONUP:
             if on_hand:
                 animes.append(on_hand)
+                on_hand.set_filter('x', anime.filter.Spring(0.2, 0.6))
+                on_hand.set_filter('y', anime.filter.Spring(0.2, 0.6))
                 on_hand = None
 
     screen.fill((255,255,255))

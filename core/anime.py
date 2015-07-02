@@ -12,6 +12,7 @@ class Anime(RubberBand):
         super().__init__()
         object.__setattr__(self, "_renderers", OrderedDict())
         object.__setattr__(self, "_blit_rect", None)
+        object.__setattr__(self, "_blit_surf", None)
 
         assert isinstance(surface, Surface), "surface must be of type Surface"
 
@@ -55,6 +56,7 @@ class Anime(RubberBand):
             (round(self.x)-new_w//2+offset[0], round(self.y)-new_h//2+offset[1]))
 
         object.__setattr__(self, "_blit_rect", rect)
+        object.__setattr__(self, "_blit_surf", tmp_surf) #TODO can be used for optimization
 
     def get_bounding_rect(self):
         if self.get_owner():
@@ -70,6 +72,15 @@ class Anime(RubberBand):
     def collide_point(self, x, y):
         if self._blit_rect:
             return self.get_bounding_rect().collidepoint(x, y)
+        return False
+
+    def collide_point_alpha(self, x, y, threshold=15):
+        if self._blit_rect:
+            rect = self.get_bounding_rect()
+            if rect.collidepoint(x, y):
+                offsetx, offsety = x - rect.topleft[0], y - rect.topleft[1]
+                return self._blit_surf.get_at((offsetx, offsety))[3] \
+                    > threshold
         return False
 
     def get_width(self):

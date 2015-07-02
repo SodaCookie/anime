@@ -11,6 +11,7 @@ class Anime(RubberBand):
     def __init__(self, surface, x, y):
         super().__init__()
         object.__setattr__(self, "_renderers", OrderedDict())
+        object.__setattr__(self, "_blit_rect", None)
 
         assert isinstance(surface, Surface), "surface must be of type Surface"
 
@@ -26,6 +27,8 @@ class Anime(RubberBand):
         self.angle = 0
         self.set_renderer('angle', renderer.angle_renderer)
         self.opacity = 255
+        self.set_renderer('opacity', renderer.opacity_renderer)
+        self.set_reducer('opacity', reducer.bot_level_reducer)
 
     def set_renderer(self, name, renderer):
         self._renderers[name] = renderer
@@ -46,17 +49,37 @@ class Anime(RubberBand):
         for child in self.get_children():
             child.render(tmp_surf, (offsetx, offsety))
 
-        surface.blit(tmp_surf,
+        object.__setattr__(self, "_rendered", tmp_surf)
+
+        rect = surface.blit(tmp_surf,
             (round(self.x)-new_w//2+offset[0], round(self.y)-new_h//2+offset[1]))
 
+        object.__setattr__(self, "_blit_rect", rect)
+
+    def get_bounding_rect(self):
+        if self.get_owner():
+            rect = self.get_owner().get_bounding_rect()
+            if rect is None:
+                return None
+            rect.size = (self.width, self.height)
+            rect.topleft = (rect.topleft[0] + self._blit_rect.topleft[0], rect.topleft[1] + self._blit_rect.topleft[1])
+            return rect
+        else:
+            return self._blit_rect
+
+    def collide_point(self, x, y):
+        if self._blit_rect:
+            return self.get_bounding_rect().collidepoint(x, y)
+        return False
+
     def get_width(self):
-        return self.surface.get_width()*self.w_ratio
+        return self.surface.get_width()*self.get_absolute_value('w_ratio')
 
     def set_width(self, width):
         self.w_ratio = width/self.surface.get_width()
 
     def get_height(self):
-        return self.surface.get_height()*self.h_ratio
+        return self.surface.get_height()*self.get_absolute_value('h_ratio')
 
     def set_height(self, height):
         self.h_ratio = height/self.surface.get_height()
@@ -67,6 +90,7 @@ class Anime(RubberBand):
     def set_pos(self, pos):
         self.x = pos[0]
         self.y = pos[1]
+
 
     width = property(get_width, set_width)
     height = property(get_height, set_height)

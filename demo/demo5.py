@@ -51,7 +51,6 @@ while playing:
         angle = math.atan2(offsety-400, offsetx-300)-math.atan2(my-400, mx-300)
         a.angle = math.degrees(angle)
     if resetting:
-        print(a.get_dirtied())
         if not a.is_dirty():
             resetting = False
             a.remove_filter("w_ratio")

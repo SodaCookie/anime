@@ -5,19 +5,19 @@ def angle_renderer(surface, angle):
 
 def wratio_renderer(surface, wratio):
     w, h = surface.get_size()
-    return pygame.transform.scale(surface, (round(w*wratio), h))
+    return pygame.transform.scale(surface, (round(abs(w*wratio)), h))
 
 def hratio_renderer(surface, hratio):
     w, h = surface.get_size()
-    return pygame.transform.scale(surface, (w, round(h*hratio)))
+    return pygame.transform.scale(surface, (w, round(abs(h*hratio))))
 
 def wratio_smooth_renderer(surface, wratio):
     w, h = surface.get_size()
-    return pygame.transform.smoothscale(surface, (round(w*wratio), h))
+    return pygame.transform.smoothscale(surface, (round(abs(w*wratio)), h))
 
 def hratio_smooth_renderer(surface, hratio):
     w, h = surface.get_size()
-    return pygame.transform.smoothscale(surface, (w, round(h*hratio)))
+    return pygame.transform.smoothscale(surface, (w, round(abs(h*hratio))))
 
 def opacity_renderer(surface, opacity):
     if opacity == 255:

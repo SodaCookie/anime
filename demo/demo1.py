@@ -13,7 +13,7 @@ test_surface2.fill((255, 255, 255, 255))
 a = anime.Anime(test_surface, 400, 300)
 b = anime.Anime(test_surface2, 150, 150)
 a.set_filter('angle', anime.filter.linear, 4)
-a.set_filter('x', anime.filter.Spring(0.3, 0.5))
+a.set_filter('x', anime.filter.exponential)
 b.set_owner(a)
 counter = 2
 playing = True

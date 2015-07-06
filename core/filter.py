@@ -32,6 +32,17 @@ def spring(cur, dest, speed, k=0.2, b=0.5):
     return new_cur, new_speed
 
 
+def exponential(cur, dest, speed, growth=1, start=0):
+    if cur < dest:
+        if cur + speed > dest:
+            return dest, start
+        return cur + speed, speed+growth
+    else:
+        if cur - speed < dest:
+            return dest, start
+        return cur - speed, speed+growth
+
+
 def time(cur, dest, speed, index=0, frames=10):
     #TODO
     diff = dest - cur

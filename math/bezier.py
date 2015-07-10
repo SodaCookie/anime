@@ -32,7 +32,7 @@ class CubicBezier(RubberBand):
         """CubicBezier takes a path of a list of 4 pairs of
         coordinates. Because CubicBezier extends Rubberband,
         it is possible to place filters on t and path. Usage of
-        this is class is to convert the parametric function for
+        this is class is to convert the paramet ric function for
         Bezier curves into appropriate x and y values for animation"""
         super().__init__()
         self.t = 0

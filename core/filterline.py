@@ -2,11 +2,11 @@ from anime.core.filter import Filter
 
 #TODO IMPLEMENT
 
-class FilterLine(list):
+class FilterLine(Filter):
 
-    def __init__(self, filters=[], speed=0):
-        super().__init__(filters)
-        self.speed=0
+    def __init__(self, filters=[], done=None, speed=0):
+        super().__init__(None, done, speed)
+        self.filters = filters
 
     def __call__(self, cur, dest, speed):
         """Functions return the new value"""
@@ -15,6 +15,9 @@ class FilterLine(list):
     def add_filter(self, filter):
         self.filters.append(filter)
 
+    def remove_filter(self, filter):
+        self.filters.remove(filter)
+
     def call(self, cur, dest, speed):
         for f in self.filters:
             cur, speed = f(cur, dest, speed)
@@ -22,3 +25,6 @@ class FilterLine(list):
 
     def done(self, cur, dest, speed):
         return cur == dest
+
+    def __getitem__(self, value):
+        return FilterLine(self.filters[value], self.done, self.speed)

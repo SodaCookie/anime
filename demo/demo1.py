@@ -13,7 +13,7 @@ test_surface2.fill((255, 255, 255, 255))
 a = anime.Anime(test_surface, 400, 300)
 b = anime.Anime(test_surface2, 150, 150)
 a.set_filter('angle', anime.filter.linear, 4)
-a.set_filter('x', anime.filter.exponential)
+a.set_filter('y', anime.filter.bounce)
 b.set_owner(a)
 counter = 2
 playing = True
@@ -26,9 +26,9 @@ while playing:
         if e.type == pygame.MOUSEBUTTONDOWN:
             counter = 4 if counter%4 else 2
             if counter == 2:
-                a.x = 100
+                a.y = 150
             else:
-                a.x = 700
+                a.y = 450
 
     screen.fill((255,255,255))
     a.update()

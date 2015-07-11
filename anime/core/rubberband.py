@@ -1,20 +1,26 @@
+"""
+This module defines the RubberBand class.
+"""
+
 from functools import reduce
 from types import FunctionType
 from copy import deepcopy
 
 from anime.core.filter import Filter
+import anime.core.reducer as reducer
 
 class RubberBand(object):
-
-    @staticmethod
-    def addition_reducer(owner, child):
-        return owner + child
-
-    @staticmethod
-    def top_level_reducer(owner, child):
-        return owner
+    """Core object within the anime library. It is responsible for
+    assigning destinations for changes for attributes found within
+    the object. This class also provides bindings to apply filters
+    and reducers to the attributes to define how the attribute will
+    be changed on the next update and how the absolute value of the
+    attribute is given, respectively."""
 
     def __init__(self):
+        """Rubberband takes no arguments. Initialization involves
+        adding internal values that are relevant to tracking changes
+        to other attributes."""
         super().__init__()
 
         object.__setattr__(self, "_reducers", {})
@@ -29,7 +35,9 @@ class RubberBand(object):
         """If attribute already exists and contains a filter funtion
         than the object will be marked as dirty and the name of the attribute
         will be passed onto the _dirtied to be passed as string and the
-        destination set in a dictionary"""
+        destination set in a dictionary. During subclassing, in order to
+        change an attribute without side effects consider using
+        object.__setattr__."""
         if hasattr(type(self), name) and \
                 isinstance(getattr(type(self), name), property):
             # Here we ignore an properties that the object may have in
@@ -47,27 +55,40 @@ class RubberBand(object):
         else:
             object.__setattr__(self, name, value)
             if isinstance(value, (int, float, complex)):
-                self._reducers[name] = RubberBand.addition_reducer
+                self._reducers[name] = reducer.addition_reducer
             else:
-                self._reducers[name] = RubberBand.top_level_reducer
+                self._reducers[name] = reducer.top_level_reducer
 
     def set_owner(self, owner):
         """Used to set ownership of an object, the ownership of an object
-        applies all effects down the tree additively for numeric values,
-        highest level owner as boolean."""
+        applies all effects down the tree additively for numeric values."""
         object.__setattr__(self, '_owner', owner)
         owner._children.append(self)
 
     def get_owner(self):
+        """Returns the owner of this object if any."""
         return self._owner
 
     def get_children(self):
+        """Returns the children of this object as a list."""
         return self._children
 
     def get_dest(self, name):
+        """Returns the destination value of the object that attribute
+        'name' is set to."""
         return self._dest.get(name)
 
     def set_filter(self, name, filter, speed=None, done=None):
+        """'filter' can be given as a function taking cur, dest and
+        speed and returning the new current and speed or a Filter
+        object. If passed a function, this method will wrap the
+        function within a filter object. If done is specified,
+        function 'done' will wrapped with the filter function inside
+        the filter object. This is not done if a Filter object is
+        given. If speed is specified the speed will override the
+        already given speed of a Filter object. Otherwise, the
+        speed will be wrapped into Filter object with filter. Speed
+        defaults to zero if not specified."""
         if not hasattr(self, name):
             raise ValueError("Does not contain the attribute %s" % name)
         if isinstance(filter, FunctionType):
@@ -81,40 +102,57 @@ class RubberBand(object):
             self._filters[name] = cpy_filter
 
     def get_filter(self, name):
+        """Returns the filter associated to the given attribute."""
         return self._filters.get(name)
 
     def remove_filter(self, name):
+        """Removed the filter attached to the given name. If that
+        attribute currently had a destination, than the attribute
+        will be set to that destination and marked clean."""
         if self._dest.get(name):
             object.__setattr__(self, name, self._dest[name])
             self._set_clean(name)
         del self._filters[name]
 
     def set_reducer(self, name, reducer):
-        """Reducers are on the lowest level"""
+        """Attach a reducer to the attribute with the given name."""
         self._reducers[name] = reducer
 
     def get_speed(self, name):
+        """Returns the current speed attached the name's filter."""
         return self._filters[name].speed
 
     def set_speed(self, name, speed):
+        """Override the set of the name's given filter"""
         self._filters[name].speed = speed
 
     def get_reducer(self, name):
+        """Returns the reducer of the given attribute name"""
         return self._reducers.get(name)
 
     def is_dirty(self):
+        """Returns True if any attributes of the object are currently not
+        at their destination."""
         return self._dirty
 
     def get_dirtied(self):
+        """Returns the list of attributes that have not reached their
+        destination."""
         return self._dirtied
 
     def get_absolute_value(self, name):
+        """Returns the absolute value of the attribute name after
+        being passed through its given reducer. The reducer used will
+        be the objects own reducer."""
         attr = [getattr(owner, name) for owner in self._get_owner_list()]
         if len(attr) == 1:
             return attr[0]
         return reduce(self.get_reducer(name), attr)
 
     def update(self):
+        """Passes all dirtied attributes through their respective filters.
+        If any attributes have reached their destination then that
+        attribute will be set as clean."""
         dirty = self._dirtied.copy()
         for name in dirty:
             value, speed = self._filters[name](getattr(self, name),
@@ -127,7 +165,10 @@ class RubberBand(object):
                 self._set_clean(name)
         self._dirtied
 
-    def _get_owner_list(self):  #FIX Should rename...
+    def _get_owner_list(self):
+        """returns the owner hierarchy above the object. Top owner
+        is always first index. The object itself is always the last
+        index."""
         cur = self
         owner_list = [cur]
         while cur.get_owner():
@@ -136,19 +177,15 @@ class RubberBand(object):
         return owner_list[::-1]
 
     def _set_clean(self, name):
+        """Removes the name from the list of dirtied attributes,
+        deletes the destination and checks if entire object is
+        clean."""
         self._dirtied.remove(name)
         del self._dest[name]
         if not self._dirtied:
             object.__setattr__(self, "_dirty", False)
 
     def _set_dirty(self, name):
+        """Sets attribute name as dirty and added to _dirtied."""
         self._dirtied.add(name)
         object.__setattr__(self, "_dirty", True)
-
-        # self.surface = surface
-        # self.pos = pos
-        # self.visible = False
-        # self.opacity = 255
-        # self.angle = 0
-        # self.width = surface.get_width()
-        # self.height = surface.get_height()

@@ -1,3 +1,7 @@
+"""
+This module defines the Anime class.
+"""
+
 from collections import OrderedDict
 
 from pygame import Surface
@@ -7,8 +11,15 @@ import anime.core.renderer as renderer
 import anime.core.reducer as reducer
 
 class Anime(RubberBand):
+    """Anime is a wrapper around RubberBand to help define common
+    attributes used in animation. It also handles the rendering
+    of a pygame Surface onto another surface."""
 
     def __init__(self, surface, x, y):
+        """Takes a surface, x and y. The surface is used for rendering.
+        X and Y are used to define the position where the surface will
+        be drawn. All Anime surfaces will be drawn anchored to center
+        to allow smooth rotation."""
         super().__init__()
         object.__setattr__(self, "_renderers", OrderedDict())
         object.__setattr__(self, "_blit_rect", None)
@@ -32,12 +43,17 @@ class Anime(RubberBand):
         self.set_reducer('opacity', reducer.bot_level_reducer)
 
     def set_renderer(self, name, renderer):
+        """Sets a renderer to the given attribute name."""
         self._renderers[name] = renderer
 
     def get_renderer(self, name):
+        """Returns the renderer of the attribute name."""
         return self._renderers.get(name)
 
     def render(self, surface, offset=(0, 0)):
+        """Given a surface. Anime will draw its wrapped surface onto the
+        given surface at its current x and y coordinates. All renderers
+        will be called to generate the proper image."""
         tmp_surf = self.surface.copy()
         prev_w, prev_h = tmp_surf.get_size()
 
@@ -59,6 +75,11 @@ class Anime(RubberBand):
         object.__setattr__(self, "_blit_surf", tmp_surf) #TODO can be used for optimization
 
     def get_bounding_rect(self):
+        """Returns a pygame Rect describing the bounding rectangle where
+        surface is drawn. If this object has not yet been drawn than None
+        is returned."""
+        if self._blit_rect is None:
+            return None
         if self.get_owner():
             rect = self.get_owner().get_bounding_rect()
             if rect is None:
@@ -70,11 +91,16 @@ class Anime(RubberBand):
             return self._blit_rect
 
     def collide_point(self, x, y):
+        """Check to see if given point x and y is inside bounding rectangle
+        of the drawn object"""
         if self._blit_rect:
             return self.get_bounding_rect().collidepoint(x, y)
         return False
 
     def collide_point_alpha(self, x, y, threshold=15):
+        """Check to see if given point x and y is inside bounding rectangle
+        of the drawn object as well as the given point's alpha is above the
+        given threshold."""
         if self._blit_rect:
             rect = self.get_bounding_rect()
             if rect.collidepoint(x, y):
@@ -84,25 +110,32 @@ class Anime(RubberBand):
         return False
 
     def get_width(self):
+        """Returns the current width of the object."""
         return self.surface.get_width()*self.get_absolute_value('w_ratio')
 
     def set_width(self, width):
+        """Sets the current width of the object"""
         self.w_ratio = width/self.surface.get_width()
 
     def get_height(self):
+        """Returns the current height of the object."""
         return self.surface.get_height()*self.get_absolute_value('h_ratio')
 
     def set_height(self, height):
+        """Sets the current height of the object"""
         self.h_ratio = height/self.surface.get_height()
 
     def get_pos(self):
+        """Returns the current position of the object."""
         return self.x, self.y
 
     def set_pos(self, pos):
+        """Sets the current position of the object"""
         self.x = pos[0]
         self.y = pos[1]
 
 
+    # Defines properties of the object
     width = property(get_width, set_width)
     height = property(get_height, set_height)
     pos = property(get_pos, set_pos)

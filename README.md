@@ -1,8 +1,13 @@
-# UNDER CONSTRUCTION
 # anime
 ## Overview
+The library defines a light declarative styled animation framework for the [pygame](http://pygame.org/news.html) library. It supports both [functional](#functional) and object-oriented paradigms.
 
 ## Installation
+You can install this library from PyPI.
+```
+python -m pip install anime
+pip install anime
+```
 
 ## Requirements
 * Python 3.x
@@ -14,6 +19,7 @@ The library defines two main types to be used: `RubberBand` and `Anime`. However
 ### RubberBand
 RubberBand defines how most classes in the library will behave. RubberBand is responsible for keeping track of its attributes' destinations and provides hooks for how those attributes will go towards their respective destinations. When an attribute in an instance of the class is mainipulated with the `__setattr__` operator and a Filter object is bound to the attribute, the attribute will be marked as dirty and the value that the attribute will be set to will be stored as a destination instead. Any attribute can be given a "Filter" which is a callable object that expects the attribute, its destination and current speed. When `instance.update` is called, the attributes current value will be passed through the filter and the new value of the attribute will be stored. Once the Filter's *done* method returns `True` given the new value, destination and speed, that attribute will be considered clean and no longer updated and set to its destination. For example:
 
+##### Object Oriented
 ``` python
 import anime.core.rubberband.RubberBand as RubberBand
 from anime.core.filter import linear
@@ -25,6 +31,20 @@ print(instance.x)                   # Prints 0
 print(instance.get_dest('x'))       # Prints 10
 instance.update()
 print(instance.x)                   # Prints 3 (linear only allows a change of up to 3)
+```
+
+Alternatively, the same implementation can be done by in a functional style by simply using the objects as simple containers and calling the same filter without binding the filters to the attribute. Effectively, implementing what the update function handles. This can be useful at times because it allows a greater amount of control during the updating step. For instance, you can add flow control between applications of seperate filters.
+
+##### Functional
+``` python
+import anime.core.rubberband.RubberBand as RubberBand
+from anime.core.filter import linear
+instance = RubberBand()             # Create instance of RubberBand
+instance.x = 0                      # Add attribute 'x' to instance (new attributes will simply be added)
+mydest = 10
+print(instance.x)                   # Prints 0
+instance.x = linear(instance.x, mydest, speed=3)
+print(instance.x)                   # Prints 3
 ```
 
 ### Anime
@@ -45,8 +65,21 @@ instance.render(screen)                         # Renders at position 100
 ...
 ```
 
+### core.filter/core.reducer/core.renderer
+`core.filter` defines prebuilt filters both as functions and classes. `core.reducer` defines prebuilt reducers. `core.renderer` defines prebuilt renderers.
+
 ### math module
-Defines math
+Defines useful wrappers around RubberBand that allow easy manipulation of coordinate systems outside if Cartesian coordinates such as Polar and Parametric functions. This is useful when you want your Anime object to follow a specific path.
+
+``` python
+from anime.math.parametric import Parametric2D
+import math
+x = lambda t: math.cos(t)
+y = lambda t: math.sin(t)
+para = Parametric2D(x, y)
+para.t = 100
+print(para.get_pos()) # Returns cos(100), sin(100)
+```
 
 ## Demos
 To run the various demos that come with this package, simply import any demo from the module anime.demo. CUrrently, there are a total of 8 demos. Source code for the demos can be foud under `[PythonLibDirectory]/anime/demo/`.

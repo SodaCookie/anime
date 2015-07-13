@@ -6,6 +6,7 @@ from anime.math.polar import Polar
 import random
 from collections import deque
 import math
+import os
 
 pygame.init()
 
@@ -15,8 +16,11 @@ x = lambda t: math.sin(t)*(math.e**math.cos(t)-2*math.cos(4*t)-math.sin(t/12)**5
 y = lambda t: math.cos(t)*(math.e**math.cos(t)-2*math.cos(4*t)-math.sin(t/12)**5)
 s = lambda phi: phi*0.5
 
+main_dir = os.path.split(os.path.abspath(__file__))[0]
+file = os.path.join(main_dir, 'images', 'image1.png')
+
 screen = pygame.display.set_mode((800, 600))
-surf = pygame.image.load("anime/demo/images/image1.png").convert_alpha()
+surf = pygame.image.load(file).convert_alpha()
 path = Parametric2D(x, y)
 spiral = Polar(s)
 pixels = deque(maxlen=MAX)

@@ -4,10 +4,14 @@ import anime
 from anime.math.bezier import CubicBezier, QuadraticBezier
 import random
 import math
+import os
 pygame.init()
 
 screen = pygame.display.set_mode((800, 600))
-surf = pygame.image.load("anime/demo/images/image1.png").convert_alpha()
+main_dir = os.path.split(os.path.abspath(__file__))[0]
+file = os.path.join(main_dir, 'images', 'image1.png')
+
+surf = pygame.image.load(file).convert_alpha()
 path1 = CubicBezier([(0, 0), (56, 500), (300, 20), (800, 600)])
 path1.set_filter('t', anime.filter.linear, 0.02)
 path2 = QuadraticBezier([(0, 0), (0, 600), (800, 600)])

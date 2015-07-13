@@ -11,7 +11,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='1.0.0b3',
+    version='1.0.0b5',
 
     description='Declarative animation library for pygame.',
 
@@ -24,6 +24,11 @@ setup(
 
     # Choose your license
     license='MIT',
+
+    include_package_data = True,
+    package_data={
+    'anime.demo': ['anime/images/image1.png'],
+    },
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[

@@ -2,10 +2,13 @@ import pygame
 import anime
 import random
 import math
+import os
 pygame.init()
 
 screen = pygame.display.set_mode((800, 600))
-surf = pygame.image.load("anime/demo/images/image1.png").convert_alpha()
+main_dir = os.path.split(os.path.abspath(__file__))[0]
+file = os.path.join(main_dir, 'images', 'image1.png')
+surf = pygame.image.load(file).convert_alpha()
 a = anime.Anime(surf, 400, 300)
 a.set_renderer('w_ratio', anime.renderer.wratio_smooth_renderer)
 a.set_renderer('h_ratio', anime.renderer.hratio_smooth_renderer)

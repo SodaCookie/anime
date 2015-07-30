@@ -122,8 +122,8 @@ class RubberBand(object):
         """Force set will override any filters present on the attribute
         and if the attribute already has a destination that attribute
         will be cleaned and set to the forced value."""
-        object.__setattr__(name, value)
-        if name in self.is_attr_dirty(name):
+        object.__setattr__(self, name, value)
+        if self.is_attr_dirty(name):
             self._set_clean(name)
 
     def get_speed(self, name):

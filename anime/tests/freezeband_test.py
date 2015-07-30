@@ -56,6 +56,16 @@ class FreezeBandTester(unittest.TestCase):
         self.a.resume("addition")
         self.assertFalse(self.a.is_frozen("addition"))
 
+    def test_hard_cancel(self):
+        self.a.addition = 10
+        self.a.update()
+        self.a.update()
+        self.assertTrue(self.a.is_attr_dirty("addition"))
+        self.assertEqual(self.a.addition, 6)
+        self.a.hard_cancel("addition")
+        self.assertFalse(self.a.is_attr_dirty("addition"))
+        self.assertEqual(self.a.addition, 6)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -13,6 +13,12 @@ def linear(cur, dest, speed):
         return cur - speed, speed
 
 
+def freeze(cur, dest, speed):
+    """Adding this filter will simply freeze the current value and speed of
+    the object"""
+    return cur, speed
+
+
 def spring(cur, dest, speed, k=0.2, b=0.5):
     # for animations, destX is really spring length (spring at rest). initial
     # position is considered as the stretched/compressed posiiton of a spring
@@ -103,6 +109,12 @@ class Linear(Filter):
 
     def __init__(self, speed):
         super().__init__(linear, None, speed)
+
+
+class Freeze(Filter):
+
+    def __init__(self):
+        super().__init__(freeze, None, 0)
 
 
 class Spring(Filter):

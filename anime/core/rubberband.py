@@ -3,7 +3,7 @@ This module defines the RubberBand class.
 """
 
 from functools import reduce
-from types import FunctionType
+from types import FunctionType, MethodType
 from copy import deepcopy
 
 from anime.core.filter import Filter
@@ -118,6 +118,14 @@ class RubberBand(object):
         """Attach a reducer to the attribute with the given name."""
         self._reducers[name] = reducer
 
+    def force_set(self, name, value):
+        """Force set will override any filters present on the attribute
+        and if the attribute already has a destination that attribute
+        will be cleaned and set to the forced value."""
+        object.__setattr__(name, value)
+        if name in self.is_attr_dirty(name):
+            self._set_clean(name)
+
     def get_speed(self, name):
         """Returns the current speed attached the name's filter."""
         return self._filters[name].speed
@@ -134,6 +142,9 @@ class RubberBand(object):
         """Returns True if any attributes of the object are currently not
         at their destination."""
         return self._dirty
+
+    def is_attr_dirty(self, name):
+        return name in self.get_dirtied()
 
     def get_dirtied(self):
         """Returns the list of attributes that have not reached their
@@ -163,7 +174,6 @@ class RubberBand(object):
                     self._dest[name], self._filters[name].speed):
                 object.__setattr__(self, name, self._dest[name])
                 self._set_clean(name)
-        self._dirtied
 
     def _get_owner_list(self):
         """returns the owner hierarchy above the object. Top owner

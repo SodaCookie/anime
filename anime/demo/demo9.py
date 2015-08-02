@@ -11,7 +11,7 @@ entrance = {
     'y' : 300
 }
 exit = {
-    'x' : 1000,
+    'x' : 850,
     'y' : 300
 }
 episode = anime.Episode(entrance, exit)
@@ -28,7 +28,7 @@ while playing:
                 tmp_surf.fill((random.randint(0, 255),
                                random.randint(0, 255),
                                random.randint(0, 255)))
-                tmp_anime = anime.Anime(tmp_surf, random.randint(200, 600),
+                tmp_anime = anime.AnimeBase(tmp_surf, random.randint(200, 600),
                                         random.randint(50, 550))
                 tmp_anime.set_filter('x', anime.filter.Spring(0.1, 0.5))
                 tmp_anime.set_filter('y', anime.filter.Spring(0.1, 0.5))

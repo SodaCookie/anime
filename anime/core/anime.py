@@ -10,10 +10,13 @@ from anime.core.rubberband import RubberBand
 import anime.core.renderer as renderer
 import anime.core.reducer as reducer
 
-class Anime(RubberBand):
+class AnimeBase(RubberBand):
     """Anime is a wrapper around RubberBand to help define common
     attributes used in animation. It also handles the rendering
-    of a pygame Surface onto another surface."""
+    of a pygame Surface onto another surface. It also introduces the
+    concept renderers which are functions that take a surface and
+    attribute and renders on that information. Several reducers are
+    set for the user in this class."""
 
     def __init__(self, surface, x, y):
         """Takes a surface, x and y. The surface is used for rendering.
@@ -31,15 +34,11 @@ class Anime(RubberBand):
         self.x = x
         self.y = y
         self.w_ratio = 1
-        self.set_renderer('w_ratio', renderer.wratio_renderer)
         self.set_reducer('w_ratio', reducer.mult_reducer)
         self.h_ratio = 1
-        self.set_renderer('h_ratio', renderer.hratio_renderer)
         self.set_reducer('h_ratio', reducer.mult_reducer)
         self.angle = 0
-        self.set_renderer('angle', renderer.angle_renderer)
         self.opacity = 255
-        self.set_renderer('opacity', renderer.opacity_renderer)
         self.set_reducer('opacity', reducer.bot_level_reducer)
 
     def set_renderer(self, name, renderer):
@@ -139,3 +138,16 @@ class Anime(RubberBand):
     width = property(get_width, set_width)
     height = property(get_height, set_height)
     pos = property(get_pos, set_pos)
+
+
+class Anime(AnimeBase):
+    """Subclass of AnimeBase that add a few renderers for convience."""
+
+    def __init__(self, surface, x, y):
+        """Takes the exact same arguments as AnimeBase"""
+        super().__init__(surface, x, y)
+
+        self.set_renderer('w_ratio', renderer.wratio_renderer)
+        self.set_renderer('h_ratio', renderer.hratio_renderer)
+        self.set_renderer('angle', renderer.angle_renderer)
+        self.set_renderer('opacity', renderer.opacity_renderer)

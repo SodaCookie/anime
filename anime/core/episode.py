@@ -20,9 +20,9 @@ class Episode:
         self._items = set()
 
     def render(self, iterable, surface):
-        for item in iterable:
-            item.render(surface)
         for item in self._unmounting:
+            item.render(surface)
+        for item in iterable:
             item.render(surface)
 
     def update(self, iterable, is_mounted=None, is_unmounted=None):

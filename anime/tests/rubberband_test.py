@@ -62,6 +62,32 @@ class RubberBandTester(unittest.TestCase):
         self.assertEqual(self.a.get_dest('x'), 1)
         self.assertEqual(self.a.get_dest('y'), 2)
 
+    def test_group_set(self):
+        self.a.group_set(x=10, y=5, top_level="hello")
+        self.assertEqual(self.a.x, 10)
+        self.assertEqual(self.a.y, 5)
+        self.assertEqual(self.a.top_level, "hello")
+
+        self.a.group_set({'x' : 5, 'y' : 10, 'top_level' : "world"})
+        self.assertEqual(self.a.x, 5)
+        self.assertEqual(self.a.y, 10)
+        self.assertEqual(self.a.top_level, "world")
+
+    def test_group_set_error(self):
+        with self.assertRaises(AttributeError):
+            self.a.group_set(doesnt_exist="hello")
+
+    def test_force_set(self):
+        self.a.set_filter('x', linear, 1)
+        self.b.set_filter('x', linear, 1)
+        self.a.x = 10
+        self.b.force_set('x', 10)
+        self.assertTrue(self.a.is_attr_dirty('x'))
+        self.assertEqual(self.a.x, 0)
+        self.assertFalse(self.b.is_attr_dirty('x'))
+        self.assertEqual(self.b.x, 10)
+
+
 
 
 if __name__ == '__main__':

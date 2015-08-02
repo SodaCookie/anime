@@ -79,7 +79,7 @@ def done_almost_equal(cur, dest, speed, ndigits=3):
 
 
 def done_speed_dest(cur, dest, speed):
-    return abs(speed) < 3 and abs(cur-dest) < 3
+    return abs(speed) < 5 and abs(cur-dest) < 5
 
 
 def done_bounds(cur, dest, speed, min_, max_):

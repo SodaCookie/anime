@@ -126,6 +126,41 @@ class RubberBand(object):
         if self.is_attr_dirty(name):
             self._set_clean(name)
 
+    def group_set(self, _setter=None, _quiet=False, **kwarg):
+        """Group set is a method used to apply changes to multiple
+        existing attributes on a RubberBand object with one call.
+        This method can take a dictionary and/or take keyword arguments,
+        where each key is the name of the attribute and the value is the
+        value of that attribute. Keyword arguments will override the values
+        found in the passed dictionary if one is provided. If a key that
+        is passed is not an attribute of the object than an AttributeError
+        is raised. If _quiet is True then no Exception will be raised
+        do to certain implementations"""
+        if not _setter:
+            _setter = {}
+        _setter.update(kwarg)
+
+        for key, value in _setter.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+            else:
+                if not _quiet:
+                    raise AttributeError("Object has no attribute '%s'"%key)
+
+    def force_group_set(self, _setter=None, _quiet=False, **kwarg):
+        """Acts exactly like group_set but when setting an attribute force_set
+        is called instead of setattr."""
+        if not _setter:
+            _setter = {}
+        _setter.update(kwarg)
+
+        for key, value in _setter.items():
+            if hasattr(self, key):
+                self.force_set(key, value)
+            else:
+                if not _quiet:
+                    raise AttributeError("Object has no attribute '%s'"%key)
+
     def get_speed(self, name):
         """Returns the current speed attached the name's filter."""
         return self._filters[name].speed

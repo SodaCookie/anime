@@ -98,6 +98,7 @@ import anime.demo.demo2
 6. *Demo 6* shows the library with many objects (200). All squares will "look" toward the cursor.
 7. *Demo 7* shows use of Bezier curves. click to move the character along the curve, press r to toggle between quadratic and cubic curve.
 8. *Demo 8* shows use of general parametric curves. Character will move along a [Butterfly Curve] (https://en.wikipedia.org/wiki/Butterfly_curve_%28transcendental%29).
+9. *Demo 9* shows use of episode. Pressing "=" will add squares randomly, pressing "-" will remove the oldest added square.
 
 ## Contact
 * **E-mail**: eric.quin.zhang@gmail.com

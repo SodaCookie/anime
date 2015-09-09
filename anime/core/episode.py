@@ -18,8 +18,13 @@ class Episode:
         self._mounting = set()
         self._unmounting = set()
         self._items = set()
+        self._remove = set()
 
     def render(self, iterable, surface):
+        for item in iterable:
+            item.render(surface)
+
+    def render_with_unmounting(self, iterable, surface):
         for item in self._unmounting:
             item.render(surface)
         for item in iterable:
@@ -89,6 +94,7 @@ class Episode:
         self._mounting = self._mounting - mounted # remove all finished mounted items
         self._items = self._items - unmounted # remove all unmounted items
         self._unmounting = self._unmounting - unmounted # remove all unmounted items
+        self._remove = self._remove | unmounted
 
 
     def mounted(self, item):
@@ -116,3 +122,11 @@ class Episode:
 
     def get_items(self):
         return self._items
+
+    def get_removed(self):
+        """Returns a list of objects that have been unmounted that are no
+        longer being updated by the episode. Call to this function empties
+        the list keeping track of removed items."""
+        tmp_remove = self._remove
+        self._remove = set()
+        return tmp_remove

@@ -39,6 +39,7 @@ while playing:
 
     screen.fill((255, 255, 255))
     episode.update(squares)
+    episode.render(episode.get_unmounting(), screen)
     episode.render(squares, screen)
     pygame.display.flip()
     pygame.time.wait(10)
